@@ -1,13 +1,20 @@
-
-import React, { useState, useEffect } from 'react';
-import { taxonomyData, getChildTaxa, getTaxonById, getTaxonPath, TaxonInfo } from '@/data/taxonomy';
-import TaxonomyBreadcrumb from '@/components/TaxonomyBreadcrumb';
-import TaxonList from '@/components/TaxonList';
-import TaxonDetail from '@/components/TaxonDetail';
-import SearchBar from '@/components/SearchBar';
+import React, { useState, useEffect } from "react";
+import {
+  taxonomyData,
+  getChildTaxa,
+  getTaxonById,
+  getTaxonPath,
+  TaxonInfo,
+} from "@/data/taxonomy";
+import TaxonomyBreadcrumb from "@/components/TaxonomyBreadcrumb";
+import TaxonList from "@/components/TaxonList";
+import TaxonDetail from "@/components/TaxonDetail";
+import SearchBar from "@/components/SearchBar";
+import TaxonomyTree from "@/components/TaxonomyTree";
+import RelatedTaxa from "@/components/RelatedTaxa";
 
 const Index = () => {
-  const [selectedTaxonId, setSelectedTaxonId] = useState<string>('');
+  const [selectedTaxonId, setSelectedTaxonId] = useState<string>("");
   const [activeTaxa, setActiveTaxa] = useState<TaxonInfo[]>([]);
   const [taxonPath, setTaxonPath] = useState<TaxonInfo[]>([]);
 
@@ -47,22 +54,46 @@ const Index = () => {
         <TaxonomyBreadcrumb path={taxonPath} onSelect={setSelectedTaxonId} />
 
         {selectedTaxon ? (
-          <TaxonDetail taxon={selectedTaxon} onSelectTaxon={setSelectedTaxonId} />
-        ) : (
-          <div className="space-y-6">
-            <div className="prose max-w-none">
-              <h2 className="text-2xl font-semibold mb-1">Основные домены живых организмов</h2>
-              <p>
-                Таксономия — наука о законах классификации и систематизации сложноорганизованных 
-                объектов: живых организмов, их сообществ и экосистем. Выберите любой таксон, 
-                чтобы изучить его подробнее и увидеть его подразделы.
-              </p>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <TaxonomyTree onSelectTaxon={setSelectedTaxonId} />
             </div>
+            <div className="lg:col-span-3 order-1 lg:order-2">
+              <TaxonDetail
+                taxon={selectedTaxon}
+                onSelectTaxon={setSelectedTaxonId}
+              />
+              <RelatedTaxa
+                taxon={selectedTaxon}
+                onSelectTaxon={setSelectedTaxonId}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-1 order-2 lg:order-1">
+              <TaxonomyTree onSelectTaxon={setSelectedTaxonId} />
+            </div>
+            <div className="lg:col-span-3 order-1 lg:order-2">
+              <div className="space-y-6">
+                <div className="prose max-w-none">
+                  <h2 className="text-2xl font-semibold mb-1">
+                    Основные домены живых организмов
+                  </h2>
+                  <p>
+                    Таксономия — наука о законах классификации и систематизации
+                    сложноорганизованных объектов: живых организмов, их
+                    сообществ и экосистем. Выберите любой таксон, чтобы изучить
+                    его подробнее и увидеть его подразделы.
+                  </p>
+                </div>
 
-            <TaxonList 
-              taxa={activeTaxa} 
-              onSelectTaxon={setSelectedTaxonId} 
-            />
+                <TaxonList
+                  taxa={activeTaxa}
+                  onSelectTaxon={setSelectedTaxonId}
+                />
+              </div>
+            </div>
           </div>
         )}
       </main>

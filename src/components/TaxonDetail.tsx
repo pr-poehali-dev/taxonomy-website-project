@@ -1,10 +1,16 @@
-
-import React from 'react';
-import { TaxonInfo, getChildTaxa } from '@/data/taxonomy';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import TaxonList from './TaxonList';
+import React from "react";
+import { TaxonInfo, getChildTaxa } from "@/data/taxonomy";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+// ... keep existing imports
+import TaxonList from "./TaxonList";
 
 interface TaxonDetailProps {
   taxon: TaxonInfo;
@@ -13,7 +19,7 @@ interface TaxonDetailProps {
 
 const TaxonDetail: React.FC<TaxonDetailProps> = ({ taxon, onSelectTaxon }) => {
   const childTaxa = getChildTaxa(taxon.id);
-  
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -21,21 +27,25 @@ const TaxonDetail: React.FC<TaxonDetailProps> = ({ taxon, onSelectTaxon }) => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold">{taxon.name}</h1>
-              <p className="text-lg text-muted-foreground italic">{taxon.latinName}</p>
+              <p className="text-lg text-muted-foreground italic">
+                {taxon.latinName}
+              </p>
             </div>
             <Badge variant="outline" className="text-sm px-3 py-1">
               {taxon.level}
             </Badge>
           </div>
-          
+
           <div className="prose max-w-none">
             <p className="text-lg">{taxon.description}</p>
           </div>
-          
+
           {taxon.characteristics && taxon.characteristics.length > 0 && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Основные характеристики</CardTitle>
+                <CardTitle className="text-lg">
+                  Основные характеристики
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 list-disc list-inside">
@@ -46,14 +56,12 @@ const TaxonDetail: React.FC<TaxonDetailProps> = ({ taxon, onSelectTaxon }) => {
               </CardContent>
             </Card>
           )}
-          
+
           {taxon.examples && taxon.examples.length > 0 && (
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Примеры</CardTitle>
-                <CardDescription>
-                  Представители данного таксона
-                </CardDescription>
+                <CardDescription>Представители данного таксона</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
@@ -67,18 +75,18 @@ const TaxonDetail: React.FC<TaxonDetailProps> = ({ taxon, onSelectTaxon }) => {
             </Card>
           )}
         </div>
-        
+
         <div>
           <div className="rounded-lg overflow-hidden border shadow-sm">
-            <img 
-              src={taxon.imageUrl} 
-              alt={taxon.name} 
-              className="w-full aspect-video object-cover" 
+            <img
+              src={taxon.imageUrl}
+              alt={taxon.name}
+              className="w-full aspect-video object-cover"
             />
           </div>
         </div>
       </div>
-      
+
       {childTaxa.length > 0 && (
         <div className="space-y-4">
           <Separator />
