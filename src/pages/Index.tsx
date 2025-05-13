@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   taxonomyData,
   getChildTaxa,
@@ -12,11 +13,22 @@ import TaxonDetail from "@/components/TaxonDetail";
 import SearchBar from "@/components/SearchBar";
 import TaxonomyTree from "@/components/TaxonomyTree";
 import RelatedTaxa from "@/components/RelatedTaxa";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, Network } from "lucide-react";
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedTaxonId, setSelectedTaxonId] = useState<string>("");
   const [activeTaxa, setActiveTaxa] = useState<TaxonInfo[]>([]);
   const [taxonPath, setTaxonPath] = useState<TaxonInfo[]>([]);
+
+  // Получаем ID таксона из URL параметров
+  useEffect(() => {
+    const taxonId = searchParams.get("taxon");
+    if (taxonId) {
+      setSelectedTaxonId(taxonId);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     // Если выбран конкретный таксон, загружаем его и его путь
@@ -30,6 +42,16 @@ const Index = () => {
       setActiveTaxa(getChildTaxa(null));
     }
   }, [selectedTaxonId]);
+
+  // Обновление URL при изменении выбранного таксона
+  const handleSelectTaxon = (id: string) => {
+    if (id) {
+      setSearchParams({ taxon: id });
+    } else {
+      setSearchParams({});
+    }
+    setSelectedTaxonId(id);
+  };
 
   const selectedTaxon = selectedTaxonId ? getTaxonById(selectedTaxonId) : null;
 
@@ -46,35 +68,42 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4">
+        <Button variant="outline" className="mb-4" asChild>
+          <Link to="/tree">
+            <Network size={16} className="mr-2" /> Просмотр полного дерева
+            таксонов
+          </Link>
+        </Button>
+      </div>
+
+      <main className="container mx-auto px-4 py-2 pb-8">
         <div className="mb-6">
-          <SearchBar taxa={taxonomyData} onSelectTaxon={setSelectedTaxonId} />
+          <SearchBar taxa={taxonomyData} onSelectTaxon={handleSelectTaxon} />
         </div>
 
-        <TaxonomyBreadcrumb path={taxonPath} onSelect={setSelectedTaxonId} />
+        <TaxonomyBreadcrumb path={taxonPath} onSelect={handleSelectTaxon} />
 
-        {selectedTaxon ? (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-1 order-2 lg:order-1">
-              <TaxonomyTree onSelectTaxon={setSelectedTaxonId} />
-            </div>
-            <div className="lg:col-span-3 order-1 lg:order-2">
-              <TaxonDetail
-                taxon={selectedTaxon}
-                onSelectTaxon={setSelectedTaxonId}
-              />
-              <RelatedTaxa
-                taxon={selectedTaxon}
-                onSelectTaxon={setSelectedTaxonId}
-              />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-1 order-2 lg:order-1">
+            <div className="sticky top-4">
+              <TaxonomyTree onSelectTaxon={handleSelectTaxon} />
             </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-1 order-2 lg:order-1">
-              <TaxonomyTree onSelectTaxon={setSelectedTaxonId} />
-            </div>
-            <div className="lg:col-span-3 order-1 lg:order-2">
+
+          <div className="lg:col-span-3 order-1 lg:order-2">
+            {selectedTaxon ? (
+              <div className="space-y-8">
+                <TaxonDetail
+                  taxon={selectedTaxon}
+                  onSelectTaxon={handleSelectTaxon}
+                />
+                <RelatedTaxa
+                  taxon={selectedTaxon}
+                  onSelectTaxon={handleSelectTaxon}
+                />
+              </div>
+            ) : (
               <div className="space-y-6">
                 <div className="prose max-w-none">
                   <h2 className="text-2xl font-semibold mb-1">
@@ -86,16 +115,20 @@ const Index = () => {
                     сообществ и экосистем. Выберите любой таксон, чтобы изучить
                     его подробнее и увидеть его подразделы.
                   </p>
+                  <p className="text-muted-foreground mt-2">
+                    <ChevronDown className="inline-block mr-1" size={16} />{" "}
+                    Прокрутите вниз, чтобы увидеть основные домены или
+                    воспользуйтесь деревом таксонов слева
+                  </p>
                 </div>
-
                 <TaxonList
                   taxa={activeTaxa}
-                  onSelectTaxon={setSelectedTaxonId}
+                  onSelectTaxon={handleSelectTaxon}
                 />
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </main>
 
       <footer className="bg-muted py-6 mt-12">
